@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  mongo1:
+    image: mongo:6.0
+    container_name: monk_commerce
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./database:/data/db
