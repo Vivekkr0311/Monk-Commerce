@@ -59,7 +59,7 @@ public class CouponController {
             );
         }
 
-
+        couponService.updateById(coupon, id);
         return new ResponseEntity<>(
                 coupon,
                 HttpStatus.OK

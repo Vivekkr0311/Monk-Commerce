@@ -2,7 +2,6 @@ package com.monk_commerce.SDE_Assignment.service;
 
 import com.monk_commerce.SDE_Assignment.entities.Coupon;
 import com.monk_commerce.SDE_Assignment.repository.CouponRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +23,17 @@ public class CouponService {
     public Coupon findById(String id){
         return couponRepository.findById(id).orElse(null);
     }
-    
+
     public void deleteById(String id){
         couponRepository.deleteById(id);
+    }
+
+    public void updateById(Coupon newCoupon, String id){
+        Coupon oldCoupon = couponRepository.findById(id).orElse(null);
+        if(newCoupon != null && oldCoupon != null){
+            oldCoupon.setType(newCoupon.getType() != null && !newCoupon.getType().equals("") ? newCoupon.getType() : oldCoupon.getType());
+            oldCoupon.setDetails(newCoupon.getDetails() != null && !newCoupon.getDetails().equals("") ? newCoupon.getDetails(): oldCoupon.getDetails());
+            couponRepository.save(oldCoupon);
+        }
     }
 }
