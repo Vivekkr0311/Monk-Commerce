@@ -1,5 +1,6 @@
 package com.monk_commerce.SDE_Assignment.service;
 
+import com.monk_commerce.SDE_Assignment.entities.CartItem;
 import com.monk_commerce.SDE_Assignment.entities.Coupon;
 import com.monk_commerce.SDE_Assignment.repository.CouponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,13 @@ public class CouponService {
             oldCoupon.setType(newCoupon.getType() != null && !newCoupon.getType().equals("") ? newCoupon.getType() : oldCoupon.getType());
             oldCoupon.setDetails(newCoupon.getDetails() != null && !newCoupon.getDetails().equals("") ? newCoupon.getDetails(): oldCoupon.getDetails());
             couponRepository.save(oldCoupon);
+        }
+    }
+
+    public void getApplicableCoupons(List<CartItem> items){
+
+        for(CartItem item : items){
+            System.out.println(item);
         }
     }
 }

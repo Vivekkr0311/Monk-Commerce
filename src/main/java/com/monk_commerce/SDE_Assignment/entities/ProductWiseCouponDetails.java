@@ -1,5 +1,6 @@
 package com.monk_commerce.SDE_Assignment.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductWiseCouponDetails implements CouponDetails{
-    private int productId;
+    @JsonProperty("product_id")
+    private int product_id;
+    @JsonProperty("discount")
     private double discount;
 }

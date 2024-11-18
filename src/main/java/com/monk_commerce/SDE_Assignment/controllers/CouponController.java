@@ -2,7 +2,6 @@ package com.monk_commerce.SDE_Assignment.controllers;
 
 import com.monk_commerce.SDE_Assignment.entities.Coupon;
 import com.monk_commerce.SDE_Assignment.service.CouponService;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
