@@ -2,7 +2,10 @@ package com.monk_commerce.SDE_Assignment.service;
 
 import com.monk_commerce.SDE_Assignment.entities.CartItem;
 import com.monk_commerce.SDE_Assignment.entities.Coupon;
+import com.monk_commerce.SDE_Assignment.entities.Product;
+import com.monk_commerce.SDE_Assignment.entities.ProductWiseCouponDetails;
 import com.monk_commerce.SDE_Assignment.repository.CouponRepository;
+import com.monk_commerce.SDE_Assignment.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +16,24 @@ public class CouponService {
     @Autowired
     private CouponRepository couponRepository;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     public void save(Coupon coupon){
+        String couponType = coupon.getType();
+
+        if(couponType.equals("cart-wise")){
+            couponRepository.save(coupon);
+        }else if(couponType.equals("product-wise")){
+            ProductWiseCouponDetails couponDetails = (ProductWiseCouponDetails) coupon.getDetails();
+            Integer product_id_coupon = couponDetails.getProduct_id();
+
+            Product product = productRepository.findById(product_id_coupon).orElse(null);
+            if(product != null){
+                product.setCoupon(coupon);
+                productRepository.save(product);
+            }
+        }
         couponRepository.save(coupon);
     }
 
