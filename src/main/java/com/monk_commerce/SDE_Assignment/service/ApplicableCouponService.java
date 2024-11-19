@@ -4,8 +4,7 @@ import com.monk_commerce.SDE_Assignment.entities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ApplicableCouponService {
@@ -23,23 +22,19 @@ public class ApplicableCouponService {
 
         // For cart-wise discount
         ApplicableCoupon applicableCouponCartWise = calculateCartWiseCouponDiscount(allCoupons, totalCartAmount);
-        if(applicableCouponCartWise != null){
+        if(!applicableCouponCartWise.getCoupon_id().isEmpty()){
             couponResponse.getApplicableCoupons().add(applicableCouponCartWise);
         }
 
         // For product-wise discount
         List<ApplicableCoupon> applicableCouponProductWise = calculateProductWiseDiscount(allCoupons, cart);
-        if(!applicableCouponProductWise.isEmpty()){
+        if(applicableCouponProductWise != null){
             couponResponse.getApplicableCoupons().addAll(applicableCouponProductWise);
         }
 
         System.out.println(allCoupons);
         System.out.println(couponResponse);
         return couponResponse;
-    }
-
-    private Double calculateCartWiseDiscount(Double totalPrice, Double discount){
-       return totalPrice - totalPrice * (discount / 100);
     }
 
     private Double calculateTotalCartPrice(Cart cart){
@@ -61,10 +56,12 @@ public class ApplicableCouponService {
             for(Coupon coupon :  allCoupons){
                 if(coupon.getType().equals("cart-wise")){
                     CartWiseCouponDetails cartWiseCouponDetails = (CartWiseCouponDetails) coupon.getDetails();
-                    Double discountCalculated = calculateCartWiseDiscount(totalCartPrice, cartWiseCouponDetails.getDiscount());
-                    applicableCoupon.setType("cart-wise");
-                    applicableCoupon.setDiscount(discountCalculated);
-                    applicableCoupon.setCoupon_id(coupon.getId());
+                    if(totalCartPrice >= cartWiseCouponDetails.getThreshold()){
+                        Double discountCalculated = totalCartPrice * (cartWiseCouponDetails.getDiscount() / 100);
+                        applicableCoupon.setType("cart-wise");
+                        applicableCoupon.setDiscount(discountCalculated);
+                        applicableCoupon.getCoupon_id().add(coupon.getId());
+                    }
                 }
             }
         }
@@ -73,36 +70,38 @@ public class ApplicableCouponService {
 
     private List<ApplicableCoupon> calculateProductWiseDiscount(List<Coupon> allCoupons, Cart cart){
         Double discount = 0.0;
+        ApplicableCoupon applicableCoupon = new ApplicableCoupon();
         List<ApplicableCoupon> applicableCouponList = new ArrayList<>();
         String coupon_id = new String();
         String coupon_type = new String();
+        HashMap<Integer, CartItem> product_id_not_matched = new HashMap<>();
         if(!allCoupons.isEmpty() && allCoupons != null){
             List<CartItem> items = cart.getCart().getItems();
             for(CartItem item : items){
-                Integer product_id = item.getProduct_id();
+                Integer product_id_from_cart = item.getProduct_id();
                 Integer quantity = item.getQuantity();
                 Double price = item.getPrice();
 
                 for(Coupon coupon : allCoupons){
-                    ApplicableCoupon applicableCoupon = new ApplicableCoupon();
                     System.out.println(coupon.getType());
                     if(coupon.getType().equals("product-wise")){
                         ProductWiseCouponDetails productWiseCouponDetails = (ProductWiseCouponDetails) coupon.getDetails();
-                        if(productWiseCouponDetails.getProduct_id() == product_id){
-                            discount = quantity * (price - productWiseCouponDetails.getDiscount());
+                        System.out.println(productWiseCouponDetails);
+                        if(productWiseCouponDetails.getProduct_id() == product_id_from_cart){
+                            discount = discount + quantity * price * (productWiseCouponDetails.getDiscount() /100);
                             coupon_id = coupon.getId();
                             coupon_type = coupon.getType();
+                            applicableCoupon.getCoupon_id().add(coupon_id);
+                            break;
                         }
-
-                        applicableCoupon.setCoupon_id(coupon_id);
-                        applicableCoupon.setDiscount(discount);
-                        applicableCoupon.setType(coupon_type);
-                        applicableCouponList.add(applicableCoupon);
                     }
                 }
             }
         }
-        return applicableCouponList;
+        applicableCoupon.setDiscount(discount);
+        applicableCoupon.setType(coupon_type);
+        applicableCouponList.add(applicableCoupon);
+        return applicableCoupon.getDiscount() == 0.0 ? null : applicableCouponList;
     }
 
     private List<Coupon> getAllCouponsOfCart(Cart cart){
@@ -115,6 +114,9 @@ public class ApplicableCouponService {
             for(CartItem item : items){
 
                 Product product = productService.findProductById(item.getProduct_id());
+                if(product == null){
+                    continue;
+                }
                 Coupon couponForThisProduct = product.getCoupon();
                 if(couponForThisProduct != null){
                     allCoupons.add(couponForThisProduct);
