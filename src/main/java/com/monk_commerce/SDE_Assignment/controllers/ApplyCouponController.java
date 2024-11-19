@@ -2,6 +2,9 @@ package com.monk_commerce.SDE_Assignment.controllers;
 
 import com.monk_commerce.SDE_Assignment.entities.Cart;
 import com.monk_commerce.SDE_Assignment.entities.CartItem;
+import com.monk_commerce.SDE_Assignment.entities.Coupon;
+import com.monk_commerce.SDE_Assignment.entities.CouponResponse;
+import com.monk_commerce.SDE_Assignment.service.ApplicableCouponService;
 import com.monk_commerce.SDE_Assignment.service.CouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,15 +22,15 @@ public class ApplyCouponController {
     @Autowired
     private CouponService couponService;
 
-    @PostMapping
-    public ResponseEntity<?>  applicableCoupons(@RequestBody Cart cart){
-        List<CartItem> item = cart.getItems();
+    @Autowired
+    private ApplicableCouponService applicableCouponService;
 
-        if(!item.isEmpty()){
-            couponService.getApplicableCoupons(item);
-        }
+    @PostMapping
+    public ResponseEntity<?> applicableCoupons(@RequestBody Cart cart){
+        CouponResponse couponResponse = applicableCouponService.getApplicableCoupons(cart);
         return new ResponseEntity<>(
-                HttpStatus.NOT_FOUND
+                couponResponse,
+                HttpStatus.OK
         );
     }
 }

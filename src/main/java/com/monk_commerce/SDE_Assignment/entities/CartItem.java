@@ -1,5 +1,6 @@
 package com.monk_commerce.SDE_Assignment.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collation = "cart_item")
 public class CartItem {
-    @Id
-    private int productId;
-    private int quantity;
-    private double price;
-    private double totalDiscount;
+    private Integer product_id;
+    private Integer quantity;
+    private Double price;
 }

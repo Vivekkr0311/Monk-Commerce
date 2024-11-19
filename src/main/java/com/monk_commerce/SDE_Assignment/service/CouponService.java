@@ -26,6 +26,7 @@ public class CouponService {
             Integer product_id_coupon = couponDetails.getProduct_id();
 
             Product product = productRepository.findById(product_id_coupon).orElse(null);
+            couponRepository.save(coupon);
             if(product != null){
                 product.setCoupon(coupon);
                 productRepository.save(product);
@@ -36,14 +37,14 @@ public class CouponService {
 
             for(ProductQuantity p : buyProducts){
                 Product foundProduct = productRepository.findById(p.getProduct_id()).orElse(null);
-
+                couponRepository.save(coupon);
                 if(foundProduct != null){
                     foundProduct.setCoupon(coupon);
                     productRepository.save(foundProduct);
                 }
             }
         }
-        couponRepository.save(coupon);
+//        couponRepository.save(coupon);
     }
 
     public List<Coupon> findAll(){
@@ -67,10 +68,7 @@ public class CouponService {
         }
     }
 
-    public void getApplicableCoupons(List<CartItem> items){
-
-        for(CartItem item : items){
-            System.out.println(item);
-        }
+    public List<Coupon> findByType(String couponType){
+        return couponRepository.findByType(couponType);
     }
 }
