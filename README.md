@@ -13,6 +13,11 @@
 
 ---
 
+## Monk Commerce Postman Collection
+
+The file `Monk Commerce.postman_collection.json` is also included in the project. Please import it into Postman to easily execute the API endpoints.
+
+---
 ## Coupon CRUD Operations
 
 ### Create Coupon
