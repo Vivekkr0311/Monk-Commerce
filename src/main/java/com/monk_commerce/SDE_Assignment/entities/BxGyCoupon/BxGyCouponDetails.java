@@ -1,0 +1,26 @@
+package com.monk_commerce.SDE_Assignment.entities.BxGyCoupon;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+
+import java.util.Set;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class BxGyCouponDetails {
+    @Id
+    private String bxgy_coupon_detail_id;
+
+    @JsonProperty("buy_products")
+    private Set<ProductQuantity> buyProducts;
+
+    @JsonProperty("get_products")
+    private Set<ProductQuantity> getProducts;
+
+    @JsonProperty("repition_limit")
+    private int repetitionLimit;
+}
