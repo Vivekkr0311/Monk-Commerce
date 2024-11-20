@@ -31,8 +31,8 @@ public class ApplicableCouponService {
         if(applicableCouponProductWise != null){
             couponResponse.getApplicableCoupons().addAll(applicableCouponProductWise);
         }
-        List<ApplicableCoupon> applicableCouponsBxGy = applyBxGyCoupon(allCoupons, cart);
-        couponResponse.getApplicableCoupons().addAll(applicableCouponsBxGy);
+        ApplicableCoupon applicableCouponsBxGy = applyBxGyCoupon(allCoupons, cart);
+        couponResponse.getApplicableCoupons().add(applicableCouponsBxGy);
 
         return couponResponse;
     }
@@ -83,7 +83,6 @@ public class ApplicableCouponService {
                 Double price = item.getPrice();
 
                 for(Coupon coupon : allCoupons){
-                    System.out.println(coupon.getType());
                     if(coupon.getType().equals("product-wise")){
                         ProductWiseCouponDetails productWiseCouponDetails = (ProductWiseCouponDetails) coupon.getDetails();
                         if(productWiseCouponDetails.getProduct_id() == product_id_from_cart){
@@ -125,7 +124,7 @@ public class ApplicableCouponService {
         return allCoupons;
     }
 
-    private List<ApplicableCoupon> applyBxGyCoupon(List<Coupon> allCoupons, Cart cart){
+    private ApplicableCoupon applyBxGyCoupon(List<Coupon> allCoupons, Cart cart){
         ApplicableCoupon applicableCoupon = new ApplicableCoupon();
         List<ApplicableCoupon> applicableCouponList = new ArrayList<>();
         Double discount = 0.0;
@@ -142,7 +141,17 @@ public class ApplicableCouponService {
             }
         }
 
-        return applicableCouponList;
+        Double totalDiscount = 0.0;
+        for (ApplicableCoupon bxgyCoupon : applicableCouponList){
+            totalDiscount = totalDiscount + bxgyCoupon.getDiscount();
+            System.out.println(bxgyCoupon);
+        }
+
+        ApplicableCoupon applicableCoupon1 = new ApplicableCoupon();
+        applicableCoupon1.setDiscount(totalDiscount);
+        applicableCoupon1.setCoupon_id(applicableCouponList.get(0).getCoupon_id());
+        applicableCoupon1.setType(applicableCouponList.get(0).getType());
+        return applicableCoupon1;
     }
 
     private Double calculateBxGyDiscount(Coupon coupon, Cart cartItem){
