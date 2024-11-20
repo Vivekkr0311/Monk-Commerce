@@ -31,9 +31,9 @@ public class ApplicableCouponService {
         if(applicableCouponProductWise != null){
             couponResponse.getApplicableCoupons().addAll(applicableCouponProductWise);
         }
+        List<ApplicableCoupon> applicableCouponsBxGy = applyBxGyCoupon(allCoupons, cart);
+        couponResponse.getApplicableCoupons().addAll(applicableCouponsBxGy);
 
-        System.out.println(allCoupons);
-        System.out.println(couponResponse);
         return couponResponse;
     }
 
@@ -86,7 +86,6 @@ public class ApplicableCouponService {
                     System.out.println(coupon.getType());
                     if(coupon.getType().equals("product-wise")){
                         ProductWiseCouponDetails productWiseCouponDetails = (ProductWiseCouponDetails) coupon.getDetails();
-                        System.out.println(productWiseCouponDetails);
                         if(productWiseCouponDetails.getProduct_id() == product_id_from_cart){
                             discount = discount + quantity * price * (productWiseCouponDetails.getDiscount() /100);
                             coupon_id = coupon.getId();
@@ -124,5 +123,73 @@ public class ApplicableCouponService {
             }
         }
         return allCoupons;
+    }
+
+    private List<ApplicableCoupon> applyBxGyCoupon(List<Coupon> allCoupons, Cart cart){
+        ApplicableCoupon applicableCoupon = new ApplicableCoupon();
+        List<ApplicableCoupon> applicableCouponList = new ArrayList<>();
+        Double discount = 0.0;
+        for(Coupon coupon : allCoupons){
+
+            if(coupon.getType().equals("bxgy")){
+                discount = calculateBxGyDiscount(coupon, cart);
+                if(discount > 0){
+                    applicableCoupon.getCoupon_id().add(coupon.getId());
+                    applicableCoupon.setType("bxgy");
+                    applicableCoupon.setDiscount(discount);
+                    applicableCouponList.add(applicableCoupon);
+                }
+            }
+        }
+
+        return applicableCouponList;
+    }
+
+    private Double calculateBxGyDiscount(Coupon coupon, Cart cartItem){
+        BxGyCouponDetails bxGyCouponDetails = (BxGyCouponDetails) coupon.getDetails();
+        Double discount = 0.0;
+        List<ProductQuantity> couponBuyProducts = bxGyCouponDetails.getBuyProducts();
+        List<ProductQuantity> couponGetProducts = bxGyCouponDetails.getGetProducts();
+        Integer couponRepetitionLimit = bxGyCouponDetails.getRepetitionLimit();
+
+        if(couponRepetitionLimit <= 0){
+            return discount;
+        }
+
+        // Check if all the products in the bxgy coupon is in the current cart
+        Boolean allRequiredItemInTheCart = true;
+        int itemInCartIdx = 0;
+        int itemWhichShouldBeInCartIdx = 0;
+        List<CartItem> cartItems = cartItem.getCart().getItems();
+        while(itemInCartIdx < cartItem.getCart().getItems().size() && itemWhichShouldBeInCartIdx < couponBuyProducts.size()){
+            if(cartItems.get(itemInCartIdx).getProduct_id() != couponBuyProducts.get(itemWhichShouldBeInCartIdx).getProduct_id()){
+                allRequiredItemInTheCart = false;
+            }else{
+                allRequiredItemInTheCart = true;
+            }
+            itemInCartIdx++;
+            itemWhichShouldBeInCartIdx++;
+        }
+
+        List<CartItem> freeItemsInTheCart = new ArrayList<>();
+        if(allRequiredItemInTheCart){
+            // If the cart is eligible for the coupon, then check if the free item exists in the cart
+            itemInCartIdx = 0;
+            int itemThatFreeIdx = 0;
+            cartItems = cartItem.getCart().getItems();
+            while(itemInCartIdx < cartItem.getCart().getItems().size() && itemThatFreeIdx < couponGetProducts.size()){
+                if(cartItems.get(itemInCartIdx).getProduct_id() == couponGetProducts.get(itemThatFreeIdx).getProduct_id()){
+                    freeItemsInTheCart.add(cartItems.get(itemInCartIdx));
+                }
+                itemInCartIdx++;
+                itemWhichShouldBeInCartIdx++;
+            }
+        }
+
+        for(CartItem freeItems : freeItemsInTheCart){
+            discount = discount + freeItems.getPrice();
+        }
+
+        return discount;
     }
 }

@@ -33,7 +33,7 @@ public class CouponService {
             }
         }else if(couponType.equals("bxgy")){
             BxGyCouponDetails couponDetails = (BxGyCouponDetails) coupon.getDetails();
-            List<ProductQuantity> buyProducts = couponDetails.getBuyProducts();
+            List<ProductQuantity> buyProducts = (List<ProductQuantity>) couponDetails.getBuyProducts();
 
             for(ProductQuantity p : buyProducts){
                 Product foundProduct = productRepository.findById(p.getProduct_id()).orElse(null);
