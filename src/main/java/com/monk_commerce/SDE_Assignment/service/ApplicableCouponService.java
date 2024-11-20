@@ -144,7 +144,6 @@ public class ApplicableCouponService {
         Double totalDiscount = 0.0;
         for (ApplicableCoupon bxgyCoupon : applicableCouponList){
             totalDiscount = totalDiscount + bxgyCoupon.getDiscount();
-            System.out.println(bxgyCoupon);
         }
 
         ApplicableCoupon applicableCoupon1 = new ApplicableCoupon();
@@ -200,5 +199,68 @@ public class ApplicableCouponService {
         }
 
         return discount;
+    }
+
+    public UpdatedCart applyCoupon(Cart cart, String coupon_id){
+        System.out.println(cart);
+        CouponResponse couponResponse = getApplicableCoupons(cart);
+
+        UpdatedCart updatedCart = new UpdatedCart();
+
+        for(ApplicableCoupon coupon : couponResponse.getApplicableCoupons()){
+           List<String> allCoupons = coupon.getCoupon_id();
+
+           for(String c : allCoupons){
+               if(c.equals(coupon_id)){
+                   // I need to apply coupon here
+                   applyCouponUsingCoupon(coupon, cart);
+                   System.out.println(coupon);
+               }
+           }
+        }
+
+        return new UpdatedCart();
+    }
+
+    private UpdatedCart applyCouponUsingCoupon(ApplicableCoupon coupon, Cart cart){
+        UpdatedCart updatedCart = new UpdatedCart();
+        if(coupon.getType().equals("cart-wise")){
+            // calculate total
+            // you have discount in coupon
+            // just make the response and send back
+
+            Double total = calculateTotalCartPrice(cart);
+            updatedCart = applyCartWiseCoupon(coupon, cart, total);
+        }else if(coupon.getType().equals("product-wise")){
+            // iterate through the cart
+            // make discount while travelling through coupon
+            // make the response and send back
+        }else if(coupon.getType().equals("bxgy")){
+            // I don't know yet.
+        }
+        return updatedCart;
+    }
+
+    private UpdatedCart applyCartWiseCoupon(ApplicableCoupon cartWiseCoupon, Cart cart, Double total){
+       String couponType = cartWiseCoupon.getType();
+       String coupon_id = String.valueOf(cartWiseCoupon.getCoupon_id());
+       Double discount = cartWiseCoupon.getDiscount();
+
+       UpdatedCartItemWrapper updatedCartItemWrapper = new UpdatedCartItemWrapper();
+       for(CartItem item :  cart.getCart().getItems()){
+           UpdatedCartItem updatedCartItem = new UpdatedCartItem();
+           updatedCartItem.setPrice(item.getPrice());
+           updatedCartItem.setProduct_id(item.getProduct_id());
+           updatedCartItem.setQuantity(item.getQuantity());
+           updatedCartItem.setTotal_discount(0.0);
+
+           updatedCartItemWrapper.getItems().add(updatedCartItem);
+       }
+
+       UpdatedCart updatedCart = new UpdatedCart();
+       updatedCart.setUpdatedCart(updatedCartItemWrapper);
+       updatedCart.setTotal_discount(total);
+       updatedCart.setFinal_price(total - discount);
+       return updatedCart;
     }
 }

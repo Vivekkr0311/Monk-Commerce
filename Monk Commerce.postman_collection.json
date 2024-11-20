@@ -1,0 +1,207 @@
+{
+	"info": {
+		"_postman_id": "feec2fec-dd20-435d-b796-e6cf3e30dae4",
+		"name": "Monk Commerce",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16907559"
+	},
+	"item": [
+		{
+			"name": "Create Coupons",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/coupons",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"coupons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all coupon",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/coupon",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"coupon"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Coupon By ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/coupon/673b4cbf65698222959ecb65",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"coupon",
+						"673b4cbf65698222959ecb65"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/coupon/673b4ddc1be6125b2ee01464",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"coupon",
+						"673b4ddc1be6125b2ee01464"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Applicable Coupons",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"cart\": {\n        \"items\": [\n            {\n                \"product_id\": 1,\n                \"quantity\": 6,\n                \"price\": 50\n            }, // Product X\n            {\n                \"product_id\": 2,\n                \"quantity\": 3,\n                \"price\": 30\n            }, // Product Y\n            {\n                \"product_id\": 3,\n                \"quantity\": 2,\n                \"price\": 25\n            } // Product Z\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/applicable-coupons",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"applicable-coupons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Product Create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/products/create",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find all products",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/products/all-products",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"all-products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Product By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/products/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Product by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/products/delete/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products",
+						"delete",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apply Coupon",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/apply-coupon/",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"apply-coupon",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
