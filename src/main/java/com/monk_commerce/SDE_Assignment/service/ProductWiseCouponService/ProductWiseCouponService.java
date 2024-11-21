@@ -9,6 +9,7 @@ import com.monk_commerce.SDE_Assignment.repository.ProductWiseCouponRepository.P
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -28,7 +29,12 @@ public class ProductWiseCouponService {
         productWiseCouponRepository.save(productWiseCoupon);
 
         Product product = productRepository.findById(productWiseCouponDetails.getProduct_id()).orElse(null);
-        product.getCoupon_ids().add(productWiseCoupon.getCoupon_id());
+        HashSet<String> coupons = product.getCoupon_ids();
+        if(!coupons.contains(productWiseCoupon.getCoupon_id())){
+            coupons.add(productWiseCoupon.getCoupon_id());
+        }else{
+            System.out.println("Already this coupon exists with id: {" + productWiseCoupon.getCoupon_id() + "}");
+        }
         productRepository.save(product);
     }
 
@@ -41,6 +47,18 @@ public class ProductWiseCouponService {
     }
 
     public void deleteById(String id){
+        List<Product> allProducts = productRepository.findAll();
+
+        for(Product product : allProducts){
+            HashSet<String> allCouponOfThisProduct = product.getCoupon_ids();
+
+            if(allCouponOfThisProduct.contains(id)){
+                allCouponOfThisProduct.remove(id);
+                productRepository.save(product);
+            }else{
+                System.out.println("No such coupon with product id: {" + product.getProduct_id() + "} and coupon id: {" + id + "}");
+            }
+        }
         productWiseCouponRepository.deleteById(id);
     }
 }

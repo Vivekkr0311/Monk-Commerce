@@ -44,14 +44,17 @@ public class CouponController {
             );
         }else if(type.equals("product-wise")){
             ProductWiseCoupon productWiseCoupon = (ProductWiseCoupon) coupon;
-            System.out.println(productWiseCoupon);
             productWiseCouponService.save(productWiseCoupon);
             return new ResponseEntity<>(
                     HttpStatus.CREATED
             );
 
         }else if(type.equals("bxgy")){
-
+            BxGyCoupon bxGyCoupon = (BxGyCoupon) coupon;
+            bxGyCouponService.save(bxGyCoupon);
+            return new ResponseEntity<>(
+                    HttpStatus.CREATED
+            );
         }
         return new ResponseEntity<>(
                 HttpStatus.BAD_REQUEST
@@ -63,6 +66,7 @@ public class CouponController {
         List<Coupon> allCoupon = new ArrayList<>();
         allCoupon.addAll(cartWiseCouponService.findAll());
         allCoupon.addAll(productWiseCouponService.findAll());
+        allCoupon.addAll(bxGyCouponService.findAll());
         return new ResponseEntity<>(
                 allCoupon,
                 HttpStatus.FOUND
@@ -87,8 +91,12 @@ public class CouponController {
         }
 
         if(isDeleted){
+            List<Coupon> allCoupon = new ArrayList<>();
+            allCoupon.addAll(cartWiseCouponService.findAll());
+            allCoupon.addAll(productWiseCouponService.findAll());
+            allCoupon.addAll(bxGyCouponService.findAll());
             return new ResponseEntity<>(
-                    "Coupon with id: {" + id +  "} deleted",
+                    allCoupon,
                 HttpStatus.OK
             );
         }

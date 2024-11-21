@@ -20,5 +20,5 @@ public class Product {
     private Integer product_id;
     private Double price;
     private Integer quantity;
-    private HashSet<String> coupon_ids;
+    private HashSet<String> coupon_ids = new HashSet<>();
 }
