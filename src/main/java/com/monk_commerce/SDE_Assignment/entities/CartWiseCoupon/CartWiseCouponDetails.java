@@ -12,6 +12,6 @@ public class CartWiseCouponDetails {
 
     @Id
     private String cart_wise_coupon_detail_id;
-    private Integer threshold;
-    private Integer discount;
+    private Double threshold;
+    private Double discount;
 }

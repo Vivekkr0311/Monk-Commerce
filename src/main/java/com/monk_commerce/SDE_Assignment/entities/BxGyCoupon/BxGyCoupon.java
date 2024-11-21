@@ -14,6 +14,6 @@ public class BxGyCoupon implements Coupon {
 
     @Id
     private String coupon_id;
-    private BxGyCouponDetails details;
     private String type = "bxgy";
+    private BxGyCouponDetails details;
 }
