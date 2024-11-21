@@ -44,9 +44,9 @@ public class ProductService {
 
     public boolean deleteByID(Integer product_id){
         Product product = productRepository.findById(product_id).orElse(null);
-        deleteRespectiveProductWiseCoupon(product);
-        deleteRespectiveBxGyCoupon(product);
         if(product != null){
+            deleteRespectiveProductWiseCoupon(product);
+            deleteRespectiveBxGyCoupon(product);
             productRepository.deleteById(product_id);
             return true;
         }
@@ -57,10 +57,12 @@ public class ProductService {
         HashSet<String> allCouponsId = product.getCoupon_ids();
 
         for(String coupon_id : allCouponsId){
-            ProductWiseCoupon productWiseCoupon = productWiseCouponService.findById(coupon_id);
+            if(coupon_id != null){
+                ProductWiseCoupon productWiseCoupon = productWiseCouponService.findById(coupon_id);
 
-            if(productWiseCoupon != null){
-                productWiseCouponService.deleteById(coupon_id);
+                if(productWiseCoupon != null){
+                    productWiseCouponService.deleteById(coupon_id);
+                }
             }
         }
     }

@@ -66,6 +66,7 @@ public class BxGyCouponService {
             if(coupon_ids.contains(id)){
                 coupon_ids.remove(id);
             }
+            productRepository.save(product);
         }
         bxGyCouponRepository.deleteById(id);
     }
