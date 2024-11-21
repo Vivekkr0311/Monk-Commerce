@@ -13,5 +13,5 @@ public class ProductWiseCouponDetails {
     @Id
     private String product_wise_coupon_detail_id;
     private Integer product_id;
-    private Integer discount;
+    private Double discount;
 }

@@ -5,7 +5,12 @@ import com.monk_commerce.SDE_Assignment.entities.Cart.Cart;
 import com.monk_commerce.SDE_Assignment.entities.Cart.CartItem;
 import com.monk_commerce.SDE_Assignment.entities.CartWiseCoupon.CartWiseCoupon;
 import com.monk_commerce.SDE_Assignment.entities.CartWiseCoupon.CartWiseCouponDetails;
+import com.monk_commerce.SDE_Assignment.entities.ProductWiseCoupon.ProductWiseCoupon;
+import com.monk_commerce.SDE_Assignment.entities.ProductWiseCoupon.ProductWiseCouponDetails;
+import com.monk_commerce.SDE_Assignment.entities.Products.Product;
 import com.monk_commerce.SDE_Assignment.service.CartWiseCouponService.CartWiseCouponService;
+import com.monk_commerce.SDE_Assignment.service.ProductService.ProductService;
+import com.monk_commerce.SDE_Assignment.service.ProductWiseCouponService.ProductWiseCouponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +22,12 @@ public class ApplicableCouponService {
     @Autowired
     private CartWiseCouponService cartWiseCouponService;
 
+    @Autowired
+    private ProductWiseCouponService productWiseCouponService;
+
+    @Autowired
+    private ProductService productService;
+
     public HashSet<ApplicableCoupon> getApplicableCoupon(Cart cart){
         Double totalCartPrice = getTotalCartPrice(cart);
         HashSet<ApplicableCoupon> applicableCouponsHashSet = new HashSet<>();
@@ -25,6 +36,7 @@ public class ApplicableCouponService {
         applicableCouponsHashSet.addAll(applyCartWiseCoupon(cart, totalCartPrice));
 
         // applying product wise coupon
+        applicableCouponsHashSet.addAll(applyProductWiseCoupon(cart));
 
         return applicableCouponsHashSet;
     }
@@ -67,13 +79,37 @@ public class ApplicableCouponService {
             }
         }
 
-        if(cartWiseCouponApplicableHashSet.isEmpty()){
-            return null;
-        }
         return cartWiseCouponApplicableHashSet;
     }
 
-//    private HashSet<ApplicableCoupon> applyProductWiseCoupon(Cart cart){
-//        for(CartItem eachCartItem : car)
-//    }
+    private HashSet<ApplicableCoupon> applyProductWiseCoupon(Cart cart){
+        HashSet<CartItem> allItemInTheCart = cart.getCart().getItems();
+        HashSet<ApplicableCoupon> productWiseCouponApplicableHashSet = new HashSet<>();
+        for(CartItem eachCartItem : allItemInTheCart){
+            Integer currentItemProductId = eachCartItem.getProduct_id();
+
+            List<ProductWiseCoupon> productWiseCouponList = productWiseCouponService.findAll();
+            for(ProductWiseCoupon productWiseCoupon : productWiseCouponList){
+                ProductWiseCouponDetails productWiseCouponDetails = productWiseCoupon.getDetails();
+
+                if(productWiseCouponDetails.getProduct_id() == currentItemProductId){
+                    // found a product wise coupon for the current cart item
+
+                    ApplicableCoupon applicableCoupon = new ApplicableCoupon();
+                    applicableCoupon.setCoupon_id(productWiseCoupon.getCoupon_id());
+                    applicableCoupon.setType(productWiseCoupon.getType());
+
+                    Double discountByCoupon = productWiseCouponDetails.getDiscount();
+                    Double cartItemPrice = eachCartItem.getPrice();
+                    Double discountToCurrentCartItem = cartItemPrice * (discountByCoupon / 100);
+
+                    applicableCoupon.setDiscount(discountToCurrentCartItem);
+
+                    productWiseCouponApplicableHashSet.add(applicableCoupon);
+                }
+            }
+        }
+
+        return productWiseCouponApplicableHashSet;
+    }
 }
