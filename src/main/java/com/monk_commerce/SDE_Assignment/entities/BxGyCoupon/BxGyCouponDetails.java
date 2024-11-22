@@ -17,10 +17,10 @@ public class BxGyCouponDetails {
     private String bxgy_coupon_detail_id;
 
     @JsonProperty("buy_products")
-    private Set<ProductQuantity> buyProducts = new HashSet<>();
+    private HashSet<ProductQuantity> buyProducts = new HashSet<>();
 
     @JsonProperty("get_products")
-    private Set<ProductQuantity> getProducts = new HashSet<>();
+    private HashSet<ProductQuantity> getProducts = new HashSet<>();
 
     @JsonProperty("repition_limit")
     private int repetitionLimit;
