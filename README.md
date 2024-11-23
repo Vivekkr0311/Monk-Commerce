@@ -78,24 +78,65 @@ Retrieve all the coupons that have been created.
 ```json
 [
    {
-       "coupon_id": "6741e6a80e221c1e928a2cf4",
-       "type": "cart-wise",
-       "details": {
-           "cart_wise_coupon_detail_id": "6741e6a80e221c1e928a2cf3",
-           "threshold": 100.0,
-           "discount": 10.0
-       }
+      "coupon_id": "6741e6a80e221c1e928a2cf4",
+      "type": "cart-wise",
+      "details": {
+         "cart_wise_coupon_detail_id": "6741e6a80e221c1e928a2cf3",
+         "threshold": 100.0,
+         "discount": 10.0
+      }
    },
    {
-       "coupon_id": "6741e66efc56bc15bd038339",
-       "type": "product-wise",
-       "details": {
-           "product_wise_coupon_detail_id": "6741e66efc56bc15bd038338",
-           "product_id": 1,
-           "discount": 20.0
-       }
+      "coupon_id": "6741e66efc56bc15bd038339",
+      "type": "product-wise",
+      "details": {
+         "product_wise_coupon_detail_id": "6741e66efc56bc15bd038338",
+         "product_id": 1,
+         "discount": 20.0
+      }
    },
-   ...
+   {
+      "coupon_id": "6741e67bfc56bc15bd03833b",
+      "type": "product-wise",
+      "details": {
+         "product_wise_coupon_detail_id": "6741e67bfc56bc15bd03833a",
+         "product_id": 1,
+         "discount": 20.0
+      }
+   },
+   {
+      "coupon_id": "6741e68f0e221c1e928a2cf2",
+      "type": "product-wise",
+      "details": {
+         "product_wise_coupon_detail_id": "6741e68f0e221c1e928a2cf1",
+         "product_id": 1,
+         "discount": 20.0
+      }
+   },
+   {
+      "coupon_id": "6741e6b40e221c1e928a2cf6",
+      "type": "bxgy",
+      "details": {
+         "bxgy_coupon_detail_id": "6741e6b40e221c1e928a2cf5",
+         "buy_products": [
+            {
+               "product_id": 2,
+               "quantity": 3
+            },
+            {
+               "product_id": 1,
+               "quantity": 3
+            }
+         ],
+         "get_products": [
+            {
+               "product_id": 3,
+               "quantity": 1
+            }
+         ],
+         "repition_limit": 2
+      }
+   }
 ]
 ```
 
@@ -153,6 +194,7 @@ Create a new coupon.
 **DELETE** `/coupons/delete/{coupon_id}`
 
 Delete a coupon by its `coupon_id`.
+Deleting will give other coupon which still exists like below response.
 
 **Response:**
 ```json
@@ -161,6 +203,9 @@ Delete a coupon by its `coupon_id`.
        "coupon_id": "6741e6a80e221c1e928a2cf4",
        "type": "cart-wise",
        "details": { ... }
+   },
+   {
+      // other coupons
    }
 ]
 ```
@@ -222,7 +267,8 @@ Check which coupons are applicable to a given cart.
 **POST** `/apply-coupon/{coupon_id}`
 
 Apply a coupon to the cart using the `coupon_id` and return the updated cart with the discount applied.
-
+Here, BxGy coupon is applied, 1 product with product id 3 is free therefore
+discount is 1 * 25 = 25
 **Response:**
 ```json
 {
