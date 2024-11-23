@@ -102,7 +102,7 @@ public class ApplicableCouponService {
             for(ProductWiseCoupon productWiseCoupon : productWiseCouponList){
                 ProductWiseCouponDetails productWiseCouponDetails = productWiseCoupon.getDetails();
 
-                if(productWiseCouponDetails.getProduct_id() == currentItemProductId){
+                if(productWiseCouponDetails.getProduct_id().equals(currentItemProductId)){
                     // found a product wise coupon for the current cart item
 
                     ApplicableCoupon applicableCoupon = new ApplicableCoupon();
@@ -228,7 +228,7 @@ public class ApplicableCouponService {
             Integer product_id = itemInTheCart.getProduct_id();
 
             for(ProductQuantity productQuantity : quantity){
-                if(productQuantity.getProduct_id() == product_id){
+                if(productQuantity.getProduct_id().equals(product_id)){
                     Integer q = productQuantity.getQuantity();
                     Double price = itemInTheCart.getPrice();
 

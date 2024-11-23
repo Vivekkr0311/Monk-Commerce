@@ -2,6 +2,8 @@ package com.monk_commerce.SDE_Assignment.service.ApplyCouponService;
 
 import com.monk_commerce.SDE_Assignment.entities.ApplicableCoupons.ApplicableCoupon;
 import com.monk_commerce.SDE_Assignment.entities.BxGyCoupon.BxGyCoupon;
+import com.monk_commerce.SDE_Assignment.entities.BxGyCoupon.BxGyCouponDetails;
+import com.monk_commerce.SDE_Assignment.entities.BxGyCoupon.ProductQuantity;
 import com.monk_commerce.SDE_Assignment.entities.Cart.Cart;
 import com.monk_commerce.SDE_Assignment.entities.Cart.CartItem;
 import com.monk_commerce.SDE_Assignment.entities.CartWiseCoupon.CartWiseCoupon;
@@ -11,6 +13,7 @@ import com.monk_commerce.SDE_Assignment.entities.UpdateCart.UpdateCart;
 import com.monk_commerce.SDE_Assignment.entities.UpdateCart.UpdateCartItem;
 import com.monk_commerce.SDE_Assignment.entities.UpdateCart.UpdateCartItemWrapper;
 import com.monk_commerce.SDE_Assignment.service.ApplicableCouponsService.ApplicableCouponService;
+import com.monk_commerce.SDE_Assignment.service.BxGyCouponService.BxGyCouponDetailsService;
 import com.monk_commerce.SDE_Assignment.service.BxGyCouponService.BxGyCouponService;
 import com.monk_commerce.SDE_Assignment.service.CartWiseCouponService.CartWiseCouponService;
 import com.monk_commerce.SDE_Assignment.service.ProductService.ProductService;
@@ -33,6 +36,9 @@ public class ApplyCouponService {
 
     @Autowired
     private ApplicableCouponService applicableCouponService;
+
+    @Autowired
+    private BxGyCouponDetailsService bxGyCouponDetailsService;
 
     @Autowired
     private ProductService productService;
@@ -71,7 +77,11 @@ public class ApplyCouponService {
             updatedCart = applyCartWiseCoupon(applicableCoupon, cart);
 
         }else if(applicableCoupon.getType().equals("product-wise")){
+            // apply product-wise coupon
             updatedCart = applyProductWiseCoupon(applicableCoupon, cart);
+        }else if(applicableCoupon.getType().equals("bxgy")){
+            // apply bxgy coupon
+            updatedCart = applyBxGyCoupon(applicableCoupon, cart);
         }
 
         return updatedCart;
@@ -153,11 +163,66 @@ public class ApplyCouponService {
             }
         }
 
-        System.out.println(updateCartItemWrapper);
         Double total_cart_price_without_discount = getTotalCartPrice(cart);
         updateCartItemWrapper.setTotal_price(total_cart_price_without_discount);
         updateCartItemWrapper.setTotal_discount(total_product_wise_discount);
         updateCartItemWrapper.setFinal_price(total_cart_price_without_discount - total_product_wise_discount);
+        return updatedCart;
+    }
+
+    private UpdateCart applyBxGyCoupon(ApplicableCoupon bxGyCoupon, Cart cart){
+        UpdateCart updatedCart = new UpdateCart();
+        updatedCart.setUpdated_cart(new UpdateCartItemWrapper());
+
+        UpdateCartItemWrapper updateCartItemWrapper = updatedCart.getUpdated_cart();
+        updateCartItemWrapper.setItems(new HashSet<>());
+
+        HashSet<UpdateCartItem> updateCartItemHashSet = updateCartItemWrapper.getItems();
+
+        System.out.println(bxGyCoupon);
+
+        String bxGyCoupon_id = bxGyCoupon.getCoupon_id();
+        BxGyCoupon bxGyCouponFromService = bxGyCouponService.findById(bxGyCoupon_id);
+        BxGyCouponDetails bxGyCouponDetails = bxGyCouponFromService.getDetails();
+        HashSet<ProductQuantity> getProducts = bxGyCouponDetails.getGetProducts();
+
+        Double total_bxgy_discount = bxGyCoupon.getDiscount();
+        Double total_cart_price = getTotalCartPrice(cart);
+
+        for(ProductQuantity productQuantity : getProducts){
+            Integer product_id = productQuantity.getProduct_id();
+
+            for(CartItem cartItem : cart.getCart().getItems()){
+                if(product_id.equals(cartItem.getProduct_id())){
+                    UpdateCartItem updateCartItem = new UpdateCartItem();
+
+                    updateCartItem.setProduct_id(cartItem.getProduct_id());
+                    updateCartItem.setQuantity(cartItem.getQuantity());
+                    updateCartItem.setPrice(cartItem.getPrice());
+
+                    updateCartItem.setTotal_discount(total_bxgy_discount);
+                    updateCartItemHashSet.add(updateCartItem);
+
+                }else{
+                    UpdateCartItem updateCartItem = new UpdateCartItem();
+
+                    updateCartItem.setProduct_id(cartItem.getProduct_id());
+                    updateCartItem.setQuantity(cartItem.getQuantity());
+                    updateCartItem.setPrice(cartItem.getPrice());
+
+                    updateCartItem.setTotal_discount(0.0);
+                    updateCartItemHashSet.add(updateCartItem);
+                }
+            }
+        }
+
+        updatedCart.getUpdated_cart().setTotal_price(total_cart_price);
+        updatedCart.getUpdated_cart().setTotal_discount(total_bxgy_discount);
+        updatedCart.getUpdated_cart().setFinal_price(total_cart_price - total_bxgy_discount);
+
+        Integer currentRepetitionLimit = bxGyCouponDetails.getRepetitionLimit();
+        bxGyCouponDetails.setRepetitionLimit(currentRepetitionLimit - 1);
+        bxGyCouponDetailsService.save(bxGyCouponDetails);
         return updatedCart;
     }
 
