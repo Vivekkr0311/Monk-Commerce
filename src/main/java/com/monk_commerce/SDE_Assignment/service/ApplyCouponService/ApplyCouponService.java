@@ -179,50 +179,57 @@ public class ApplyCouponService {
 
         HashSet<UpdateCartItem> updateCartItemHashSet = updateCartItemWrapper.getItems();
 
-        System.out.println(bxGyCoupon);
 
         String bxGyCoupon_id = bxGyCoupon.getCoupon_id();
         BxGyCoupon bxGyCouponFromService = bxGyCouponService.findById(bxGyCoupon_id);
         BxGyCouponDetails bxGyCouponDetails = bxGyCouponFromService.getDetails();
-        HashSet<ProductQuantity> getProducts = bxGyCouponDetails.getGetProducts();
+        Integer repetion_limit = bxGyCouponDetails.getRepetitionLimit();
 
-        Double total_bxgy_discount = bxGyCoupon.getDiscount();
-        Double total_cart_price = getTotalCartPrice(cart);
+        if(repetion_limit > 0){
+            HashSet<ProductQuantity> getProducts = bxGyCouponDetails.getGetProducts();
 
-        for(ProductQuantity productQuantity : getProducts){
-            Integer product_id = productQuantity.getProduct_id();
+            Double total_bxgy_discount = bxGyCoupon.getDiscount();
+            Double total_cart_price = getTotalCartPrice(cart);
 
-            for(CartItem cartItem : cart.getCart().getItems()){
-                if(product_id.equals(cartItem.getProduct_id())){
-                    UpdateCartItem updateCartItem = new UpdateCartItem();
+            for(ProductQuantity productQuantity : getProducts){
+                Integer product_id = productQuantity.getProduct_id();
 
-                    updateCartItem.setProduct_id(cartItem.getProduct_id());
-                    updateCartItem.setQuantity(cartItem.getQuantity());
-                    updateCartItem.setPrice(cartItem.getPrice());
+                for(CartItem cartItem : cart.getCart().getItems()){
+                    if(product_id.equals(cartItem.getProduct_id())){
+                        UpdateCartItem updateCartItem = new UpdateCartItem();
 
-                    updateCartItem.setTotal_discount(total_bxgy_discount);
-                    updateCartItemHashSet.add(updateCartItem);
+                        updateCartItem.setProduct_id(cartItem.getProduct_id());
+                        updateCartItem.setQuantity(cartItem.getQuantity());
+                        updateCartItem.setPrice(cartItem.getPrice());
 
-                }else{
-                    UpdateCartItem updateCartItem = new UpdateCartItem();
+                        updateCartItem.setTotal_discount(total_bxgy_discount);
+                        updateCartItemHashSet.add(updateCartItem);
 
-                    updateCartItem.setProduct_id(cartItem.getProduct_id());
-                    updateCartItem.setQuantity(cartItem.getQuantity());
-                    updateCartItem.setPrice(cartItem.getPrice());
+                    }else{
+                        UpdateCartItem updateCartItem = new UpdateCartItem();
 
-                    updateCartItem.setTotal_discount(0.0);
-                    updateCartItemHashSet.add(updateCartItem);
+                        updateCartItem.setProduct_id(cartItem.getProduct_id());
+                        updateCartItem.setQuantity(cartItem.getQuantity());
+                        updateCartItem.setPrice(cartItem.getPrice());
+
+                        updateCartItem.setTotal_discount(0.0);
+                        updateCartItemHashSet.add(updateCartItem);
+                    }
                 }
             }
+
+            updatedCart.getUpdated_cart().setTotal_price(total_cart_price);
+            updatedCart.getUpdated_cart().setTotal_discount(total_bxgy_discount);
+            updatedCart.getUpdated_cart().setFinal_price(total_cart_price - total_bxgy_discount);
+
+            Integer currentRepetitionLimit = bxGyCouponDetails.getRepetitionLimit();
+            bxGyCouponDetails.setRepetitionLimit(currentRepetitionLimit - 1);
+            bxGyCouponDetailsService.save(bxGyCouponDetails);
+            bxGyCouponService.save(bxGyCouponFromService);
+        }else{
+            System.out.println("Repetion limit over");
+            return new UpdateCart();
         }
-
-        updatedCart.getUpdated_cart().setTotal_price(total_cart_price);
-        updatedCart.getUpdated_cart().setTotal_discount(total_bxgy_discount);
-        updatedCart.getUpdated_cart().setFinal_price(total_cart_price - total_bxgy_discount);
-
-        Integer currentRepetitionLimit = bxGyCouponDetails.getRepetitionLimit();
-        bxGyCouponDetails.setRepetitionLimit(currentRepetitionLimit - 1);
-        bxGyCouponDetailsService.save(bxGyCouponDetails);
         return updatedCart;
     }
 
