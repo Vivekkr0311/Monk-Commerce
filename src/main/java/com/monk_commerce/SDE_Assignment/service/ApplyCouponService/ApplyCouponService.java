@@ -115,6 +115,8 @@ public class ApplyCouponService {
         UpdateCart updatedCart = new UpdateCart();
         updatedCart.setUpdated_cart(new UpdateCartItemWrapper());
 
+        Double total_product_wise_discount = 0.0;
+
         UpdateCartItemWrapper updateCartItemWrapper = updatedCart.getUpdated_cart();
         updateCartItemWrapper.setItems(new HashSet<>());
 
@@ -136,9 +138,37 @@ public class ApplyCouponService {
                 Double discount = productWiseCoupon.getDiscount();
                 updateCartItem.setTotal_discount(discount);
                 updateCartItemHashSet.add(updateCartItem);
+
+                updateCartItemWrapper.setTotal_discount(discount);
+                total_product_wise_discount = discount;
+            }else{
+                UpdateCartItem updateCartItem = new UpdateCartItem();
+
+                updateCartItem.setProduct_id(item.getProduct_id());
+                updateCartItem.setQuantity(item.getQuantity());
+                updateCartItem.setPrice(item.getPrice());
+
+                updateCartItem.setTotal_discount(0.0);
+                updateCartItemHashSet.add(updateCartItem);
             }
         }
 
+        System.out.println(updateCartItemWrapper);
+        Double total_cart_price_without_discount = getTotalCartPrice(cart);
+        updateCartItemWrapper.setTotal_price(total_cart_price_without_discount);
+        updateCartItemWrapper.setTotal_discount(total_product_wise_discount);
+        updateCartItemWrapper.setFinal_price(total_cart_price_without_discount - total_product_wise_discount);
         return updatedCart;
+    }
+
+    private Double getTotalCartPrice(Cart cart){
+        Double totalCartPrice = 0.0;
+
+        for(CartItem eachCartItem : cart.getCart().getItems()){
+            Integer quantity = eachCartItem.getQuantity();
+            Double price = eachCartItem.getPrice();
+            totalCartPrice = totalCartPrice + quantity * price;
+        }
+        return totalCartPrice;
     }
 }
