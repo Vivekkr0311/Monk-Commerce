@@ -59,6 +59,18 @@ public class ProductWiseCouponService {
                 System.out.println("No such coupon with product id: {" + product.getProduct_id() + "} and coupon id: {" + id + "}");
             }
         }
+        deleteProductWiseCouponDetails(id);
         productWiseCouponRepository.deleteById(id);
+    }
+
+    private void deleteProductWiseCouponDetails(String id){
+        ProductWiseCoupon productWiseCoupon = productWiseCouponRepository.findById(id).orElse(null);
+
+        if(productWiseCoupon != null){
+            ProductWiseCouponDetails productWiseCouponDetails = productWiseCoupon.getDetails();
+            String productWiseCouponeDetailsId = productWiseCouponDetails.getProduct_wise_coupon_detail_id();
+
+            productWiseCouponDetailsRepository.deleteById(productWiseCouponeDetailsId);
+        }
     }
 }

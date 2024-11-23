@@ -39,6 +39,7 @@ public class ApplicableCouponController {
     @PostMapping("/applicable-coupons")
     public ResponseEntity<?> applicableCoupon(@RequestBody Cart cart){
         HashSet<ApplicableCoupon> allApplicableCoupon = applicableCouponService.getApplicableCoupon(cart);
+        applicableCouponList.setApplicable_coupons(new HashSet<>());
         applicableCouponList.getApplicable_coupons().addAll(allApplicableCoupon);
         return new ResponseEntity<>(
                 applicableCouponList,

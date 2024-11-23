@@ -6,6 +6,7 @@ import com.monk_commerce.SDE_Assignment.entities.Cart.Cart;
 import com.monk_commerce.SDE_Assignment.entities.Cart.CartItem;
 import com.monk_commerce.SDE_Assignment.entities.CartWiseCoupon.CartWiseCoupon;
 import com.monk_commerce.SDE_Assignment.entities.ProductWiseCoupon.ProductWiseCoupon;
+import com.monk_commerce.SDE_Assignment.entities.ProductWiseCoupon.ProductWiseCouponDetails;
 import com.monk_commerce.SDE_Assignment.entities.UpdateCart.UpdateCart;
 import com.monk_commerce.SDE_Assignment.entities.UpdateCart.UpdateCartItem;
 import com.monk_commerce.SDE_Assignment.entities.UpdateCart.UpdateCartItemWrapper;
@@ -69,6 +70,8 @@ public class ApplyCouponService {
             // apply cart-wise coupon
             updatedCart = applyCartWiseCoupon(applicableCoupon, cart);
 
+        }else if(applicableCoupon.getType().equals("product-wise")){
+            updatedCart = applyProductWiseCoupon(applicableCoupon, cart);
         }
 
         return updatedCart;
@@ -108,8 +111,34 @@ public class ApplyCouponService {
         return updatedCart;
     }
 
-    private HashSet<UpdateCartItem> applyProductWiseCoupon(Cart cart, ProductWiseCoupon productWiseCoupon){
-        return new HashSet<>();
-    }
+    private UpdateCart applyProductWiseCoupon(ApplicableCoupon productWiseCoupon, Cart cart){
+        UpdateCart updatedCart = new UpdateCart();
+        updatedCart.setUpdated_cart(new UpdateCartItemWrapper());
 
+        UpdateCartItemWrapper updateCartItemWrapper = updatedCart.getUpdated_cart();
+        updateCartItemWrapper.setItems(new HashSet<>());
+
+        HashSet<UpdateCartItem> updateCartItemHashSet = updateCartItemWrapper.getItems();
+
+        String coupon_id_from_coupon = productWiseCoupon.getCoupon_id();
+        ProductWiseCoupon productWiseCoupon1 = productWiseCouponService.findById(coupon_id_from_coupon);
+        ProductWiseCouponDetails productWiseCouponDetails = productWiseCoupon1.getDetails();
+        Integer product_id_ = productWiseCouponDetails.getProduct_id();
+
+        for(CartItem item : cart.getCart().getItems()){
+            if(item.getProduct_id().equals(product_id_)){
+                UpdateCartItem updateCartItem = new UpdateCartItem();
+
+                updateCartItem.setProduct_id(item.getProduct_id());
+                updateCartItem.setQuantity(item.getQuantity());
+                updateCartItem.setPrice(item.getPrice());
+
+                Double discount = productWiseCoupon.getDiscount();
+                updateCartItem.setTotal_discount(discount);
+                updateCartItemHashSet.add(updateCartItem);
+            }
+        }
+
+        return updatedCart;
+    }
 }
