@@ -102,8 +102,8 @@ public class ApplyCouponService {
         Double final_discount = totalPrice - cartWiseCoupon.getDiscount();
 
         updateCartItemWrapper.setFinal_price(final_discount);
-        updateCartItemWrapper.setTotal_discount(totalPrice);
-        updateCartItemWrapper.setTotal_price(cartWiseCoupon.getDiscount());
+        updateCartItemWrapper.setTotal_price(totalPrice);
+        updateCartItemWrapper.setTotal_discount(cartWiseCoupon.getDiscount());
 
         return updatedCart;
     }
