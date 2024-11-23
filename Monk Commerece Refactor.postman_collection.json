@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "2f656d43-32ae-448b-bb8a-41d83ef5cd6b",
+		"_postman_id": "43783785-a503-4650-a723-9b1b0b525bf1",
 		"name": "Monk Commerece Refactor",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "16907559"
@@ -249,6 +249,34 @@
 							"port": "8080",
 							"path": [
 								"applicable-coupons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apply Coupon",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cart\": {\n        \"items\": [\n            {\n                \"product_id\": 1,\n                \"quantity\": 6,\n                \"price\": 50\n            }, // Product X\n            {\n                \"product_id\": 2,\n                \"quantity\": 3,\n                \"price\": 30\n            }, // Product Y\n            {\n                \"product_id\": 3,\n                \"quantity\": 2,\n                \"price\": 25\n            } // Product Z\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/apply-coupon/67407040a40d5361aac07b23",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apply-coupon",
+								"67407040a40d5361aac07b23"
 							]
 						}
 					},
